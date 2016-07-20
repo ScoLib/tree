@@ -1,0 +1,19 @@
+{
+    "name": "scolib/tree",
+    "description": "tree",
+    "license": "Apache-2.0",
+    "authors": [
+        {
+            "name": "klgd",
+            "email": "slice1213@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.5.9"
+    },
+    "autoload": {
+        "psr-4": {
+            "ScoLib\\": "src/"
+        }
+    },
+}
