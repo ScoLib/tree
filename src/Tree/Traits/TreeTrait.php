@@ -3,7 +3,9 @@
 namespace ScoLib\Tree\Traits;
 
 
-use InvalidArgumentException, ArrayAccess, BadMethodCallException;
+use InvalidArgumentException;
+use ArrayAccess;
+use BadMethodCallException;
 
 trait TreeTrait
 {
@@ -24,7 +26,7 @@ trait TreeTrait
     protected function getTreeDataParentIdName()
     {
         return property_exists($this, 'treeDataParentIdName') ? $this->treeDataParentIdName
-            : 'parent_id';
+                                                              : 'parent_id';
     }
 
     protected function getTreeSpacer()
@@ -65,13 +67,13 @@ trait TreeTrait
     }
 
     /**
-     * 得到子级数组（仅子代一级）
+     * 获取子级（仅子代一级）
      *
      * @param mixed $parentId
      *
      * @return array
      */
-    protected function getSiblingsChildren($parentId)
+    protected function getSubLevel($parentId)
     {
         $data = $this->getData();
 
@@ -85,38 +87,39 @@ trait TreeTrait
     }
 
     /**
-     * 获取指定节点的所有子级
+     * 获取指定节点的所有后代，并组成同级集合
      * @param mixed $parentId
      * @param int $depth
      *
      * @return \Illuminate\Support\Collection
      */
-    protected function getAllChildren($parentId, $depth = 0)
+    protected function getSiblingsOfDescendants($parentId, $depth = 0)
     {
         static $array;
         if (!$array instanceof ArrayAccess || $depth == 0) {
             $array = collect([]);
         }
-        $child = $this->getSiblingsChildren($parentId);
+        $child = $this->getSubLevel($parentId);
         if ($child) {
-            $depth++;
+            $nextDepth = $depth + 1;
             foreach ($child as $val) {
                 //$val->depth = $depth;
                 $array->put($val->{$this->getTreeDataIdName()}, $val);
-                $this->getAllChildren($val->{$this->getTreeDataIdName()}, $depth);
+                $this->getSiblingsOfDescendants($val->{$this->getTreeDataIdName()}, $nextDepth);
             }
         }
         return $array;
     }
 
-    public function getMultiChild($id)
+    public function getLayerOfDescendants($id)
     {
-        $child = $this->getChild($id);
-        $data  = [];
+        $child = $this->getSubLevel($id);
+        $data  = collect([]);
         if ($child) {
-            foreach ($child as $key => $val) {
-                $data[$key]           = $val;
-                $data[$key]['_child'] = $this->getMultiChild($val['id']);
+            foreach ($child as $val) {
+                $val->child = $this->getLayerOfDescendants($val->{$this->getTreeDataIdName()});
+                $data->put($val->{$this->getTreeDataIdName()}, $val);
+
             }
         }
         return $data;
@@ -158,7 +161,7 @@ trait TreeTrait
      *
      * @return array
      */
-    public function getPos($id)
+    public function getAncestors($id)
     {
         $return = [];
         if (!isset($this->data[$id])) {
