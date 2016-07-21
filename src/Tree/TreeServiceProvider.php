@@ -25,9 +25,6 @@ class TreeServiceProvider extends ServiceProvider
         $this->publishes([
             __DIR__ . '/../config/config.php' => config_path('tree.php'),
         ]);
-
-        // Register blade directives
-        $this->bladeDirectives();
     }
 
     /**
