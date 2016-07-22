@@ -31,37 +31,38 @@ trait TreeTrait
 
     protected function getTreeSpacer()
     {
-        return property_exists($this, 'treeSpacer') ? $this->treeSpacer : '&nbsp;&nbsp;';
+        return property_exists($this, 'treeSpacer') ? $this->treeSpacer : '&nbsp;&nbsp;&nbsp;';
     }
 
     protected function getTreeFirstIcon()
     {
-        return property_exists($this, 'treeFirstIcon') ? $this->treeFirstIcon : '│';
+        return property_exists($this, 'treeFirstIcon') ? $this->treeFirstIcon : '&nbsp;&nbsp;&nbsp;│ ';
     }
 
     protected function getTreeMiddleIcon()
     {
-        return property_exists($this, 'treeMiddleIcon') ? $this->treeMiddleIcon : '├';
+        return property_exists($this, 'treeMiddleIcon') ? $this->treeMiddleIcon : '&nbsp;&nbsp;&nbsp;├─ ';
     }
 
     protected function getTreeLastIcon()
     {
-        return property_exists($this, 'treeLastIcon') ? $this->treeLastIcon : '└';
+        return property_exists($this, 'treeLastIcon') ? $this->treeLastIcon : '&nbsp;&nbsp;&nbsp;└─ ';
     }
 
     /**
-     * 获取待格式树结构的数据
+     * 获取待格式树结构的节点数据
      * @return mixed
      */
-    protected function getData()
+    protected function getAllNodes()
     {
-        $data = $this->getTreeData(); // 由use的class来实现
-        if (!method_exists($this, 'getTreeData')) {
-            throw new BadMethodCallException('Method [getTreeData] does not exist.');
+        if (!method_exists($this, 'getTreeAllNodes')) {
+            throw new BadMethodCallException('Method [getTreeAllNodes] does not exist.');
         }
 
+        $data = $this->getTreeAllNodes(); // 由use的class来实现
+
         if (!$data instanceof ArrayAccess) {
-            throw new InvalidArgumentException('tree data must is collection');
+            throw new InvalidArgumentException('tree data must be a collection');
         }
         return $data;
     }
@@ -75,7 +76,7 @@ trait TreeTrait
      */
     protected function getSubLevel($parentId)
     {
-        $data = $this->getData();
+        $data = $this->getAllNodes();
 
         $childList = collect([]);
         foreach ($data as $val) {
@@ -87,30 +88,50 @@ trait TreeTrait
     }
 
     /**
-     * 获取指定节点的所有后代，并组成同级集合
+     * 获取指定节点的所有后代
      * @param mixed $parentId
      * @param int $depth
+     * @param string $adds
      *
      * @return \Illuminate\Support\Collection
      */
-    protected function getSiblingsOfDescendants($parentId, $depth = 0)
+    protected function getDescendants($parentId, $depth = 0, $adds = '')
     {
         static $array;
         if (!$array instanceof ArrayAccess || $depth == 0) {
             $array = collect([]);
         }
+        $number = 1;
         $child = $this->getSubLevel($parentId);
         if ($child) {
             $nextDepth = $depth + 1;
+            $total = $child->count();
             foreach ($child as $val) {
-                //$val->depth = $depth;
+                $j = $k = '';
+                if ($number == $total) {
+                    $j .= $this->getTreeLastIcon();
+                } else {
+                    $j .= $this->getTreeMiddleIcon();
+                    $k = $adds ? $this->getTreeFirstIcon() : '';
+                }
+
+                $val->spacer = $adds ? ($adds . $j) : '';
+
+                $val->depth = $depth;
                 $array->put($val->{$this->getTreeDataIdName()}, $val);
-                $this->getSiblingsOfDescendants($val->{$this->getTreeDataIdName()}, $nextDepth);
+                $this->getDescendants($val->{$this->getTreeDataIdName()}, $nextDepth, $adds . $k . $this->getTreeSpacer());
+                $number++;
             }
         }
         return $array;
     }
 
+    /**
+     * 获取指定节点的所有后代（分层级）
+     * @param mixed $id
+     *
+     * @return \Illuminate\Support\Collection
+     */
     public function getLayerOfDescendants($id)
     {
         $child = $this->getSubLevel($id);
@@ -133,7 +154,7 @@ trait TreeTrait
      *
      * @return array
      */
-    public function getParent($id)
+    /*public function getParent($id)
     {
         $data = [];
         if (!isset($this->data[$id])) {
@@ -149,7 +170,7 @@ trait TreeTrait
             }
         }
         return $data;
-    }
+    }*/
 
 
 
@@ -161,7 +182,7 @@ trait TreeTrait
      *
      * @return array
      */
-    public function getAncestors($id)
+    /*public function getAncestors($id)
     {
         $return = [];
         if (!isset($this->data[$id])) {
@@ -179,43 +200,6 @@ trait TreeTrait
             }
         }
         return $return;
-    }
-
-
-    /**
-     * 格式化数组(二维数组)
-     *
-     * @param integer $id
-     * @param string  $adds
-     *
-     * @return array
-     */
-    function getArray($id = 0, $adds = '')
-    {
-        $number = 1;
-        $child  = $this->getChild($id);
-        if (is_array($child)) {
-            $total = count($child);
-            foreach ($child as $key => $val) {
-                $j = $k = '';
-                if ($number == $total) {
-                    $j .= $this->_config['TREE_ICON'][2];
-                } else {
-                    $j .= $this->_config['TREE_ICON'][1];
-                    $k = $adds ? $this->_config['TREE_ICON'][0] : $this->_config['TREE_ICON'][0];
-                }
-                $spacer                                        = $adds ? $adds . $j : '';
-                $val['spacer']                                 = $spacer;
-                $this->arrTmp[$val[$this->_config['TREE_ID']]] = $val;
-                $this->getArray($key, $adds . $k . $this->_config['TREE_NBSP']);
-                $number++;
-            }
-        }
-
-        return $this->arrTmp;
-    }
-
-
-
+    }*/
 
 }
