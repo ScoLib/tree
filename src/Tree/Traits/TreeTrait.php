@@ -14,18 +14,18 @@ trait TreeTrait
      * 数据主ID名
      * @return string
      */
-    protected function getTreeDataIdName()
+    protected function getTreeNodeIdName()
     {
-        return property_exists($this, 'treeDataIdName') ? $this->treeDataIdName : 'id';
+        return property_exists($this, 'treeNodeIdName') ? $this->treeNodeIdName : 'id';
     }
 
     /**
      * 数据父ID名
      * @return string
      */
-    protected function getTreeDataParentIdName()
+    protected function getTreeNodeParentIdName()
     {
-        return property_exists($this, 'treeDataParentIdName') ? $this->treeDataParentIdName
+        return property_exists($this, 'treeNodeParentIdName') ? $this->treeNodeParentIdName
                                                               : 'parent_id';
     }
 
@@ -64,7 +64,12 @@ trait TreeTrait
         if (!$data instanceof ArrayAccess) {
             throw new InvalidArgumentException('tree data must be a collection');
         }
-        return $data;
+        // 重置键值
+        $all = collect([]);
+        foreach ($data as $item) {
+            $all->put($item->{$this->getTreeNodeIdName()}, $item);
+        }
+        return $all;
     }
 
     /**
@@ -80,8 +85,8 @@ trait TreeTrait
 
         $childList = collect([]);
         foreach ($data as $val) {
-            if ($val->{$this->getTreeDataParentIdName()} == $parentId) {
-                $childList->put($val->{$this->getTreeDataIdName()}, $val);
+            if ($val->{$this->getTreeNodeParentIdName()} == $parentId) {
+                $childList->put($val->{$this->getTreeNodeIdName()}, $val);
             }
         }
         return $childList;
@@ -118,8 +123,8 @@ trait TreeTrait
                 $val->spacer = $adds ? ($adds . $j) : '';
 
                 $val->depth = $depth;
-                $array->put($val->{$this->getTreeDataIdName()}, $val);
-                $this->getDescendants($val->{$this->getTreeDataIdName()}, $nextDepth, $adds . $k . $this->getTreeSpacer());
+                $array->put($val->{$this->getTreeNodeIdName()}, $val);
+                $this->getDescendants($val->{$this->getTreeNodeIdName()}, $nextDepth, $adds . $k . $this->getTreeSpacer());
                 $number++;
             }
         }
@@ -138,68 +143,52 @@ trait TreeTrait
         $data  = collect([]);
         if ($child) {
             foreach ($child as $val) {
-                $val->child = $this->getLayerOfDescendants($val->{$this->getTreeDataIdName()});
-                $data->put($val->{$this->getTreeDataIdName()}, $val);
+                $val->child = $this->getLayerOfDescendants($val->{$this->getTreeNodeIdName()});
+                $data->put($val->{$this->getTreeNodeIdName()}, $val);
 
             }
         }
         return $data;
     }
 
-
     /**
-     * 得到父级数组（仅父代一级）
+     * 获取父一级节点
      *
-     * @param integer $id
+     * @param mixed $id
      *
-     * @return array
+     * @return mixed
      */
-    /*public function getParent($id)
+    public function getParent($id)
     {
-        $data = [];
-        if (!isset($this->data[$id])) {
-            return false;
+        $data = $this->getAllNodes();
+        if (($node = $data->get($id))) {
+            $parentId = $node->{$this->getTreeNodeParentIdName()};
+            return $parentId ? $data->get($parentId) : null;
         }
-        $pid = $this->data[$id][$this->_config['TREE_PARENT_ID']];
-        $pid = $this->data[$pid][$this->_config['TREE_PARENT_ID']];
-        if (is_array($this->data)) {
-            foreach ($this->data as $key => $val) {
-                if ($val[$this->_config['TREE_PARENT_ID']] == $pid) {
-                    $data[$key] = $val;
-                }
-            }
-        }
-        return $data;
-    }*/
+    }
 
 
 
 
     /**
-     * 得到当前位置数组（二维数组）
+     * 获取节点的所有祖先
      *
      * @param integer $id
      *
      * @return array
      */
-    /*public function getAncestors($id)
+    public function getAncestors($id)
     {
-        $return = [];
-        if (!isset($this->data[$id])) {
-            return false;
+        static $array;
+        if (!$array instanceof ArrayAccess) {
+            $array = collect([]);
         }
-        $this->posTmp[] = $this->data[$id];
-        $pid            = $this->data[$id][$this->_config['TREE_PARENT_ID']];
-        if (isset($this->data[$pid])) {
-            $this->getPos($pid);
+        $parent = $this->getParent($id);
+        if ($parent) {
+            $array->prepend($parent);   // 添加到开头
+            $this->getAncestors($parent->{$this->getTreeNodeIdName()});
         }
-        if (is_array($this->posTmp)) {
-            krsort($this->posTmp);
-            foreach ($this->posTmp as $val) {
-                $return[$val[$this->_config['TREE_ID']]] = $val;
-            }
-        }
-        return $return;
-    }*/
+        return $array;
+    }
 
 }
