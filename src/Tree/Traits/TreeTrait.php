@@ -174,19 +174,21 @@ trait TreeTrait
      * 获取节点的所有祖先
      *
      * @param integer $id
+     * @param integer $depth
      *
      * @return array
      */
-    public function getAncestors($id)
+    public function getAncestors($id, $depth = 0)
     {
         static $array;
-        if (!$array instanceof ArrayAccess) {
+        if (!$array instanceof ArrayAccess  || $depth == 0) {
             $array = collect([]);
         }
         $parent = $this->getParent($id);
         if ($parent) {
+            $nextDepth = $depth + 1;
             $array->prepend($parent);   // 添加到开头
-            $this->getAncestors($parent->{$this->getTreeNodeIdName()});
+            $this->getAncestors($parent->{$this->getTreeNodeIdName()}, $nextDepth);
         }
         return $array;
     }
