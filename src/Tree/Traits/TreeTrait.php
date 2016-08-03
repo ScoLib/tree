@@ -10,6 +10,8 @@ use BadMethodCallException;
 trait TreeTrait
 {
 
+    private $allNodes = null;
+
     /**
      * 数据主ID名
      * @return string
@@ -55,6 +57,10 @@ trait TreeTrait
      */
     protected function getAllNodes()
     {
+        if ($this->allNodes) {
+            return $this->allNodes;
+        }
+
         if (!method_exists($this, 'getTreeAllNodes')) {
             throw new BadMethodCallException('Method [getTreeAllNodes] does not exist.');
         }
@@ -65,11 +71,11 @@ trait TreeTrait
             throw new InvalidArgumentException('tree data must be a collection');
         }
         // 重置键值
-        $all = collect([]);
+        $this->allNodes = collect([]);
         foreach ($data as $item) {
-            $all->put($item->{$this->getTreeNodeIdName()}, $item);
+            $this->allNodes->put($item->{$this->getTreeNodeIdName()}, $item);
         }
-        return $all;
+        return $this->allNodes;
     }
 
     /**
