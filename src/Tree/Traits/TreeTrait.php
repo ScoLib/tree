@@ -14,6 +14,7 @@ trait TreeTrait
 
     /**
      * 数据主ID名
+     *
      * @return string
      */
     protected function getTreeNodeIdName()
@@ -23,6 +24,7 @@ trait TreeTrait
 
     /**
      * 数据父ID名
+     *
      * @return string
      */
     protected function getTreeNodeParentIdName()
@@ -38,21 +40,25 @@ trait TreeTrait
 
     protected function getTreeFirstIcon()
     {
-        return property_exists($this, 'treeFirstIcon') ? $this->treeFirstIcon : '&nbsp;&nbsp;&nbsp;│ ';
+        return property_exists($this, 'treeFirstIcon') ? $this->treeFirstIcon
+                                                       : '&nbsp;&nbsp;&nbsp;│ ';
     }
 
     protected function getTreeMiddleIcon()
     {
-        return property_exists($this, 'treeMiddleIcon') ? $this->treeMiddleIcon : '&nbsp;&nbsp;&nbsp;├─ ';
+        return property_exists($this, 'treeMiddleIcon') ? $this->treeMiddleIcon
+                                                        : '&nbsp;&nbsp;&nbsp;├─ ';
     }
 
     protected function getTreeLastIcon()
     {
-        return property_exists($this, 'treeLastIcon') ? $this->treeLastIcon : '&nbsp;&nbsp;&nbsp;└─ ';
+        return property_exists($this, 'treeLastIcon') ? $this->treeLastIcon
+                                                      : '&nbsp;&nbsp;&nbsp;└─ ';
     }
 
     /**
      * 获取待格式树结构的节点数据
+     *
      * @return mixed
      */
     protected function getAllNodes()
@@ -100,8 +106,9 @@ trait TreeTrait
 
     /**
      * 获取指定节点的所有后代
-     * @param mixed $parentId
-     * @param int $depth
+     *
+     * @param mixed  $parentId
+     * @param int    $depth
      * @param string $adds
      *
      * @return \Illuminate\Support\Collection
@@ -113,14 +120,15 @@ trait TreeTrait
             $array = collect([]);
         }
         $number = 1;
-        $child = $this->getSubLevel($parentId);
+        $child  = $this->getSubLevel($parentId);
         if ($child) {
             $nextDepth = $depth + 1;
-            $total = $child->count();
+            $total     = $child->count();
             foreach ($child as $val) {
                 $j = $k = '';
                 if ($number == $total) {
                     $j .= $this->getTreeLastIcon();
+                    $k = $this->getTreeSpacer();
                 } else {
                     $j .= $this->getTreeMiddleIcon();
                     $k = $adds ? $this->getTreeFirstIcon() : '';
@@ -130,7 +138,11 @@ trait TreeTrait
 
                 $val->depth = $depth;
                 $array->put($val->{$this->getTreeNodeIdName()}, $val);
-                $this->getDescendants($val->{$this->getTreeNodeIdName()}, $nextDepth, $adds . $k . $this->getTreeSpacer());
+                $this->getDescendants(
+                    $val->{$this->getTreeNodeIdName()},
+                    $nextDepth,
+                    $adds . $k . $this->getTreeSpacer()
+                );
                 $number++;
             }
         }
@@ -139,6 +151,7 @@ trait TreeTrait
 
     /**
      * 获取指定节点的所有后代（分层级）
+     *
      * @param mixed $id
      *
      * @return \Illuminate\Support\Collection
@@ -174,8 +187,6 @@ trait TreeTrait
     }
 
 
-
-
     /**
      * 获取节点的所有祖先
      *
@@ -187,7 +198,7 @@ trait TreeTrait
     public function getAncestors($id, $depth = 0)
     {
         static $array;
-        if (!$array instanceof ArrayAccess  || $depth == 0) {
+        if (!$array instanceof ArrayAccess || $depth == 0) {
             $array = collect([]);
         }
         $parent = $this->getParent($id);
