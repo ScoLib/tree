@@ -3,6 +3,7 @@
 namespace ScoLib\Tree\Traits;
 
 
+use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use ArrayAccess;
 use BadMethodCallException;
@@ -82,6 +83,16 @@ trait TreeTrait
             $this->allNodes->put($item->{$this->getTreeNodeIdName()}, $item);
         }
         return $this->allNodes;
+    }
+
+    /**
+     * 设置 所有节点
+     *
+     * @param \Illuminate\Support\Collection $nodes
+     */
+    protected function setAllNodes(Collection $nodes)
+    {
+        $this->allNodes = $nodes;
     }
 
     /**
