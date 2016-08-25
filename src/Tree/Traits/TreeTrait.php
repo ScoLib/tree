@@ -2,7 +2,6 @@
 
 namespace ScoLib\Tree\Traits;
 
-
 use Illuminate\Support\Collection;
 use InvalidArgumentException;
 use ArrayAccess;
@@ -10,11 +9,10 @@ use BadMethodCallException;
 
 trait TreeTrait
 {
-
     private $allNodes = null;
 
     /**
-     * 数据主ID名
+     * 数据主ID名.
      *
      * @return string
      */
@@ -24,7 +22,7 @@ trait TreeTrait
     }
 
     /**
-     * 数据父ID名
+     * 数据父ID名.
      *
      * @return string
      */
@@ -58,7 +56,7 @@ trait TreeTrait
     }
 
     /**
-     * 获取待格式树结构的节点数据
+     * 获取待格式树结构的节点数据.
      *
      * @return mixed
      */
@@ -82,11 +80,12 @@ trait TreeTrait
         foreach ($data as $item) {
             $this->allNodes->put($item->{$this->getTreeNodeIdName()}, $item);
         }
+
         return $this->allNodes;
     }
 
     /**
-     * 设置 所有节点
+     * 设置 所有节点.
      *
      * @param \Illuminate\Support\Collection $nodes
      */
@@ -96,7 +95,7 @@ trait TreeTrait
     }
 
     /**
-     * 获取子级（仅子代一级）
+     * 获取子级（仅子代一级）.
      *
      * @param mixed $parentId
      *
@@ -112,11 +111,12 @@ trait TreeTrait
                 $childList->put($val->{$this->getTreeNodeIdName()}, $val);
             }
         }
+
         return $childList;
     }
 
     /**
-     * 获取指定节点的所有后代
+     * 获取指定节点的所有后代.
      *
      * @param mixed  $parentId
      * @param int    $depth
@@ -131,10 +131,10 @@ trait TreeTrait
             $array = collect([]);
         }
         $number = 1;
-        $child  = $this->getSubLevel($parentId);
+        $child = $this->getSubLevel($parentId);
         if ($child) {
             $nextDepth = $depth + 1;
-            $total     = $child->count();
+            $total = $child->count();
             foreach ($child as $val) {
                 $j = $k = '';
                 if ($number == $total) {
@@ -145,23 +145,24 @@ trait TreeTrait
                     $k = $adds ? $this->getTreeFirstIcon() : '';
                 }
 
-                $val->spacer = $adds ? ($adds . $j) : '';
+                $val->spacer = $adds ? ($adds.$j) : '';
 
                 $val->depth = $depth;
                 $array->put($val->{$this->getTreeNodeIdName()}, $val);
                 $this->getDescendants(
                     $val->{$this->getTreeNodeIdName()},
                     $nextDepth,
-                    $adds . $k . $this->getTreeSpacer()
+                    $adds.$k.$this->getTreeSpacer()
                 );
-                $number++;
+                ++$number;
             }
         }
+
         return $array;
     }
 
     /**
-     * 获取指定节点的所有后代（分层级）
+     * 获取指定节点的所有后代（分层级）.
      *
      * @param mixed $id
      *
@@ -170,19 +171,19 @@ trait TreeTrait
     public function getLayerOfDescendants($id)
     {
         $child = $this->getSubLevel($id);
-        $data  = collect([]);
+        $data = collect([]);
         if ($child) {
             foreach ($child as $val) {
                 $val->child = $this->getLayerOfDescendants($val->{$this->getTreeNodeIdName()});
                 $data->put($val->{$this->getTreeNodeIdName()}, $val);
-
             }
         }
+
         return $data;
     }
 
     /**
-     * 获取父一级节点
+     * 获取父一级节点.
      *
      * @param mixed $id
      *
@@ -193,16 +194,16 @@ trait TreeTrait
         $data = $this->getAllNodes();
         if (($node = $data->get($id))) {
             $parentId = $node->{$this->getTreeNodeParentIdName()};
+
             return $parentId ? $data->get($parentId) : null;
         }
     }
 
-
     /**
-     * 获取节点的所有祖先
+     * 获取节点的所有祖先.
      *
-     * @param integer $id
-     * @param integer $depth
+     * @param int $id
+     * @param int $depth
      *
      * @return array
      */
@@ -218,7 +219,7 @@ trait TreeTrait
             $array->prepend($parent);   // 添加到开头
             $this->getAncestors($parent->{$this->getTreeNodeIdName()}, $nextDepth);
         }
+
         return $array;
     }
-
 }
