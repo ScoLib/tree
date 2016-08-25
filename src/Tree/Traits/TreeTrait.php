@@ -2,10 +2,10 @@
 
 namespace ScoLib\Tree\Traits;
 
-use Illuminate\Support\Collection;
-use InvalidArgumentException;
 use ArrayAccess;
 use BadMethodCallException;
+use Illuminate\Support\Collection;
+use InvalidArgumentException;
 
 trait TreeTrait
 {
