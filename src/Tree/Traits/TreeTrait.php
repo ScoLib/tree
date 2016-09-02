@@ -60,7 +60,7 @@ trait TreeTrait
      *
      * @return mixed
      */
-    protected function getAllNodes()
+    final protected function getAllNodes()
     {
         if ($this->allNodes) {
             return $this->allNodes;
@@ -89,7 +89,7 @@ trait TreeTrait
      *
      * @param \Illuminate\Support\Collection $nodes
      */
-    protected function setAllNodes(Collection $nodes)
+    public function setAllNodes(Collection $nodes)
     {
         $this->allNodes = $nodes;
     }
@@ -101,7 +101,7 @@ trait TreeTrait
      *
      * @return array
      */
-    protected function getSubLevel($parentId)
+    public function getSubLevel($parentId)
     {
         $data = $this->getAllNodes();
 
@@ -124,7 +124,7 @@ trait TreeTrait
      *
      * @return \Illuminate\Support\Collection
      */
-    protected function getDescendants($parentId, $depth = 0, $adds = '')
+    public function getDescendants($parentId, $depth = 0, $adds = '')
     {
         static $array;
         if (!$array instanceof ArrayAccess || $depth == 0) {
@@ -182,6 +182,13 @@ trait TreeTrait
         return $data;
     }
 
+    /**
+     * 获取指定id的数据
+     *
+     * @param mixed $id
+     *
+     * @return mixed
+     */
     public function getSelf($id)
     {
         $data = $this->getAllNodes();
