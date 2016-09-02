@@ -182,6 +182,12 @@ trait TreeTrait
         return $data;
     }
 
+    public function getSelf($id)
+    {
+        $data = $this->getAllNodes();
+        return $data->get($id);
+    }
+
     /**
      * 获取父一级节点.
      *
@@ -191,12 +197,13 @@ trait TreeTrait
      */
     public function getParent($id)
     {
-        $data = $this->getAllNodes();
-        if (($node = $data->get($id))) {
+        $node = $this->getSelf($id);
+        if ($node) {
             $parentId = $node->{$this->getTreeNodeParentIdName()};
-
-            return $parentId ? $data->get($parentId) : null;
+            return $this->getSelf($parentId);
         }
+
+        return null;
     }
 
     /**
