@@ -1,6 +1,6 @@
 <?php
 
-namespace ScoLib\Tree\Traits;
+namespace Sco\Tree\Traits;
 
 use ArrayAccess;
 use BadMethodCallException;

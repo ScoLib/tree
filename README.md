@@ -24,7 +24,7 @@
 <?php 
 namespace App\Repositories;
 
-use ScoLib\Tree\Traits\TreeTrait;
+use Sco\Tree\Traits\TreeTrait;
 
 class MyClass
 {
