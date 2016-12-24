@@ -1,6 +1,12 @@
 # ScoLib/tree
 是一个将数据格式化为树形结构的类库
 
+[![StyleCI](https://styleci.io/repos/63778855/shield?branch=master)](https://styleci.io/repos/63778855)
+[![Latest Stable Version](https://poser.pugx.org/scolib/tree/v/stable)](https://packagist.org/packages/scolib/tree)
+[![Total Downloads](https://poser.pugx.org/scolib/tree/downloads)](https://packagist.org/packages/scolib/tree)
+[![Latest Unstable Version](https://poser.pugx.org/scolib/tree/v/unstable)](https://packagist.org/packages/scolib/tree)
+[![License](https://poser.pugx.org/scolib/tree/license)](https://packagist.org/packages/scolib/tree)
+
 ## 安装
 
 执行命令:
