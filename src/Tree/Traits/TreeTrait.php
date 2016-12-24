@@ -183,7 +183,7 @@ trait TreeTrait
     }
 
     /**
-     * 获取指定id的数据
+     * 获取指定id的数据.
      *
      * @param mixed $id
      *
@@ -192,6 +192,7 @@ trait TreeTrait
     public function getSelf($id)
     {
         $data = $this->getAllNodes();
+
         return $data->get($id);
     }
 
@@ -207,10 +208,9 @@ trait TreeTrait
         $node = $this->getSelf($id);
         if ($node) {
             $parentId = $node->{$this->getTreeNodeParentIdName()};
+
             return $this->getSelf($parentId);
         }
-
-        return null;
     }
 
     /**
